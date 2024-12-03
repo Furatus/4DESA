@@ -2,6 +2,9 @@ using System.Reflection;
 using System.Text;
 using AzureAPI;
 using AzureAPI.Services;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +16,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Configuration.AddEnvironmentVariables();
+
+string keyVaultUri = builder.Configuration["KeyVaultUri"];
+
+/*if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}*/
+
+builder.Services.AddSingleton<SecretsManager>();
     
 builder.Services.AddAuthentication(options =>
 {
@@ -55,11 +70,15 @@ builder.Services.AddCors(c =>
 builder.Services.AddScoped<IJwtAuthService, JwtAuthService>();
 builder.Services.AddScoped<IAzureService, AzureService>();
 builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(Env.dbString));
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<BlobServiceClient>(_ => new BlobServiceClient(Env.blobStorageConnectionString));
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors();
 
 app.MapControllers();
 
@@ -67,4 +86,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => "Hello World!");
 app.Run();

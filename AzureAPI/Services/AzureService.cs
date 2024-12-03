@@ -302,11 +302,33 @@ public class AzureService : IAzureService
     
     public void UploadMedia(Guid id, string media)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "UPDATE Posts SET Media_Url = @MediaUrl WHERE Id = @Id";
+            var parameters = new {Id = id, MediaUrl = media};
+            
+            _dbConnection.Execute(query, parameters);
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
     
     public void DeletePost(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "DELETE FROM Posts WHERE Id = @Id";
+            var parameters = new {Id = id};
+            
+            _dbConnection.Execute(query, parameters);
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
 }

@@ -75,3 +75,5 @@ C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\ref\AzureAPI.d
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Blobs.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Common.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.IO.Hashing.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Extensions.AspNetCore.Configuration.Secrets.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Security.KeyVault.Secrets.dll
