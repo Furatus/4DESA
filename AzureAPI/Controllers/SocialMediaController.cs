@@ -1,4 +1,5 @@
-﻿using AzureAPI.Models;
+﻿using System.Security.Claims;
+using AzureAPI.Models;
 using AzureAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
@@ -21,13 +22,15 @@ public class SocialMediaController : ControllerBase
     [HttpPost]
     public IActionResult Register(IAzureService azure, [FromBody] RegisterUserDto userDto)
     {
-        if (userDto == null)
-        {
-            return BadRequest("User is null");
-        }
-        
         try
         {
+            if (userDto == null)
+                 {
+                     return BadRequest("Please provide user information");
+                 }
+            
+            if (azure.GetUserByName(userDto.Username) != null) return BadRequest("Username already exists, please choose another one");
+            
             var user = new User
             {
                 Username = userDto.Username,
@@ -52,8 +55,6 @@ public class SocialMediaController : ControllerBase
     {
         try
         {
-            //return Ok(itemId.Id);
-            //var userGuid = idService.ParseId(itemId.Id);
             var foundUser = azure.GetUserById(itemId.Id);
             if (foundUser == null)
             {
@@ -68,10 +69,77 @@ public class SocialMediaController : ControllerBase
         }
     }
     
-    [Route("test")]
-    public IActionResult Test([FromQuery] string id)
+    [Route("getby/username")]
+    [SwaggerResponse(200, "ok", typeof(User))]
+    [HttpGet]
+    public IActionResult GetUserByName(IAzureService azure, [FromQuery] Username username)
     {
-        var result = idService.ParseId(id);
-        return Ok(result);
+        try
+        {
+            var foundUser = azure.GetUserByName(username.Name);
+            if (foundUser == null)
+            {
+                return NotFound($"User name : {username.Name} not found");
+            }
+
+            return Ok(foundUser);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+    
+    [Route("update")]
+    [HttpPatch]
+    [SwaggerResponse(404, "Utilisateur non trouvé", null)]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(200, "ok", null)]
+    [Authorize]
+    public IActionResult UpdateUser(IAzureService azure, [FromBody] UserUpdateDto userDto)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId != userDto.Id.ToString()) return Unauthorized("You are not allowed to modify other users");
+        azure.UpdateUser(userDto.Id, userDto);
+        return Ok();
+    }
+    
+    [HttpDelete]
+    [Route("delete")]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(404, "Utilisateur non trouvé", null)]
+    [SwaggerResponse(200, "ok", null)]
+    [Authorize]
+    public IActionResult Delete(IAzureService azure, [FromQuery] ItemId itemId)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId != itemId.Id.ToString()) return Unauthorized("You are not allowed to delete other users");
+        var id = itemId.Id;
+        azure.DeleteUser(id);
+        return Ok();
+    }
+}
+
+[Route("/api/auth/")]
+[ApiController]
+public class AuthController : ControllerBase
+{
+    [HttpPost]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(200, "ok", typeof(string))]
+    [Route("login")]
+    public IActionResult Login(IJwtAuthService jwtAuthService, [FromBody] Login login)
+    {
+        var user = jwtAuthService.Authenticate(login);
+        if (user == null) return Unauthorized("User not found, wrong username/password");
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+        };
+        var token = jwtAuthService.GenerateToken(
+            Env.JwtSecret, claims);
+
+        return Ok(token);
     }
 }

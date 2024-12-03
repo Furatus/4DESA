@@ -13,9 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-    
     
 builder.Services.AddAuthentication(options =>
 {
@@ -55,6 +52,7 @@ builder.Services.AddCors(c =>
     });
 });
 
+builder.Services.AddScoped<IJwtAuthService, JwtAuthService>();
 builder.Services.AddScoped<IAzureService, AzureService>();
 builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(Env.dbString));
 
@@ -66,5 +64,7 @@ app.UseSwaggerUI();
 app.MapControllers();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
