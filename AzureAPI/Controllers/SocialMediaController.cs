@@ -116,7 +116,20 @@ public class SocialMediaController : ControllerBase
         if (userId != itemId.Id.ToString()) return Unauthorized("You are not allowed to delete other users");
         var id = itemId.Id;
         azure.DeleteUser(id);
-        return Ok();
+        return Ok("Deleted user.");
+    }
+    
+    [Route("togglePrivate")]
+    [HttpPost]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(200, "ok", null)]
+    [Authorize]
+    public IActionResult TogglePrivate(IAzureService azure, [FromQuery] ItemId itemId)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId != itemId.Id.ToString()) return Unauthorized("You are not allowed to delete other users");
+        azure.TogglePrivate(itemId.Id);
+        return Ok("Toggled private status.");
     }
 }
 
@@ -142,4 +155,50 @@ public class AuthController : ControllerBase
 
         return Ok(token);
     }
+}
+
+[Route("/api/post/")]
+[ApiController]
+[SwaggerResponse(400, "Mauvaise requête", null)]
+[SwaggerResponse(405, "Méthode non autorisée", null)]
+[SwaggerResponse(500, "Erreur Interne", null)]
+public class PostController : ControllerBase
+{
+    [HttpPost]
+    [Route("create")]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(200, "ok", typeof(Guid))]
+    [Authorize]
+    public IActionResult CreatePost(IAzureService azure, [FromBody] CreatePost cpost)
+    {
+        if (cpost == null || cpost.Title == null)
+        {
+            return BadRequest("Please provide post information (at least a title)");
+        }
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var post = new Post
+        {
+            Id = Guid.NewGuid(),
+            Title = cpost.Title,
+            Content = cpost.Content,
+            Author = Guid.Parse(userId),
+            Date = DateTime.Now
+        };
+        
+        var id = azure.CreatePost(post);
+        return Created($"/api/post/{id}", id);
+    }
+        
+    [HttpGet]
+    [Route("getby/id")]
+    [SwaggerResponse(200, "ok", typeof(Post))]
+    [SwaggerResponse(403, "Interdit / profil privé", null)]
+    public IActionResult GetPostById(IAzureService azure, [FromQuery] ItemId itemId)
+    {
+        var post = azure.GetPostById(itemId.Id);
+        if (post == null) return NotFound("Post not found");
+        return Ok(post);
+    }
+    
+       
 }

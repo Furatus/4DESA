@@ -138,17 +138,20 @@ public class AzureService : IAzureService
             {
                 throw new Exception("No data to update");
             }
+            var checkifUsernameAlreadyExists = GetUserByName(user.Username);
+            if (checkifUsernameAlreadyExists != null) throw new Exception("Username already exists");
 
             var queryBuildString = "";
             if (user.Username != null) queryBuildString += "Username = @Username";
             if (user.Password != null) queryBuildString += ",Password = @Password";
             if (user.Email != null) queryBuildString += ",Email = @Email";
             if (queryBuildString.StartsWith(',')) queryBuildString = queryBuildString.Remove(0, 1);
+            
             _dbConnection.Open();
             var query = $"UPDATE Users SET {queryBuildString} WHERE Id = @Id";
             var parameters = new
             {
-                Id = id, Username = user.Username, Password = user.Password, Email = user.Email
+                Id = id, Username = user.Username, Password = EncryptionService.EncryptString(user.Password), Email = user.Email
             };
             
             _dbConnection.Execute(query, parameters);
@@ -161,22 +164,93 @@ public class AzureService : IAzureService
     
     public void DeleteUser(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "DELETE FROM Users WHERE Id = @Id";
+            var parameters = new {Id = id};
+            
+            _dbConnection.Execute(query, parameters);
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
     
-    public void setPrivate()
+    public void TogglePrivate(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "UPDATE Users SET IsPrivate = ~IsPrivate WHERE Id = @Id";
+            var parameters = new {Id = id};
+            
+            _dbConnection.Execute(query, parameters);
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        
+        }
     }
     
     public Guid CreatePost(Post post)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query =
+                "INSERT INTO Posts (id, Title, Content, Author, media_Url, CreatedAt) VALUES (@Id, @Title, @Content, @Author, @MediaUrl, @CreatedAt)";
+            var parameters = new
+            {
+                Id = post.Id, Title = post.Title, Content = post.Content, Author = post.Author, MediaUrl = "", CreatedAt = DateTime.Now
+            };
+            
+            _dbConnection.Execute(query, parameters);
+            
+            return post.Id;
+
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
+    }
+    
+    public Post MapPost(dynamic dbpost)
+    {
+        return new Post
+        {
+            Id = dbpost.Id,
+            Title = dbpost.Title,
+            Content = dbpost.Content,
+            Author = dbpost.Author,
+            Date = DateTime.SpecifyKind(dbpost.CreatedAt, DateTimeKind.Utc),
+            MediaUrl = dbpost.Media_Url
+        };
     }
     
     public Post GetPostById(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "SELECT Id, Title, Content, Author, CreatedAt, Media_Url FROM Posts WHERE Id = @Id";
+            var parameters = new {Id = id};
+            var dbpost = _dbConnection.Query(query, parameters).Select(MapPost).SingleOrDefault();
+            
+            if (dbpost == null)
+            {
+                return null;
+            }
+
+            return dbpost;
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
     
     public List<Post> GetPostsfromUserId(Guid id)

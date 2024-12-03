@@ -2,20 +2,11 @@
 
 namespace AzureAPI.Models;
 
-public class Post
+public class CreatePost
 {
-    public Guid Id { get; set; }
-    
     [Required]
     public string? Title { get; set; }
     
     [Required]
     public string? Content { get; set; }
-    
-    public Guid Author { get; set; }
-    
-    public DateTime Date { get; set; }
-    
-    public string? MediaUrl { get; set; }
-    
 }
