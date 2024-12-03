@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace AzureAPI.Services;
 
@@ -17,16 +18,18 @@ public class BlobStorageService : IBlobStorageService
     {
         try
         {
-            var post = _azureService.GetPostById(PostId);
-            if (post == null)
-            {
-                throw new Exception("Post not found");
-            }
-
             var containerClient = _blobServiceClient.GetBlobContainerClient("mediastorage");
             var fileExtension = Path.GetExtension(file.FileName);
             var blobClient = containerClient.GetBlobClient($"{PostId}{fileExtension}");
-            blobClient.UploadAsync(file.OpenReadStream(), true);
+            var blobHttpHeaders = new BlobHttpHeaders
+            {
+                ContentType = file.ContentType
+            };
+
+            blobClient.Upload(file.OpenReadStream(), new BlobUploadOptions
+            {
+                HttpHeaders = blobHttpHeaders,
+            });
 
             var blobUri = blobClient.Uri.ToString();
             _azureService.UploadMedia(PostId, blobUri);
