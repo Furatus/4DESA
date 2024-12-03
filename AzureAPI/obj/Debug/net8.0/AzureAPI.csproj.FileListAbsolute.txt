@@ -72,3 +72,6 @@ C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\refint\AzureAP
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\AzureAPI.pdb
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\AzureAPI.genruntimeconfig.cache
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\ref\AzureAPI.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Blobs.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Common.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.IO.Hashing.dll

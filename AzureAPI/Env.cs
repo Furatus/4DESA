@@ -10,10 +10,9 @@ public static class Env
         {
             /*DotEnv.Load();
             var envvars = DotEnv.Read();
-
             return envvars["JWT_SECRET"];*/
-
-            return Environment.GetEnvironmentVariable("JWT_SECRET")?? "DEFAULTSECRETKEY";
+            //return Environment.GetEnvironmentVariable("JWT_SECRET")?? "DEFAULTSECRETKEY";
+            return "";
         }
     }
     
@@ -23,9 +22,27 @@ public static class Env
         {
             //return Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? "";
             // Development connection string
-            return
-                "Server=tcp:4desadatabaseservice.database.windows.net,1433;Initial Catalog=SocialMediaDB;Persist Security Info=False;User ID=SocialMediaAdmin;Password=9]VGT+nsYB)>7-6;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            return "";
             //return Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? "Host=localhost;Database=ibay_api;Username=postgres;Password=postgres";
+        }
+    }
+    
+    public static string passwordHashKey
+    {
+        get
+        {
+            //return "b14ca5898a4e4133bbce2ea2315a1916";
+            //return Environment.GetEnvironmentVariable("PASSWORD_HASH_KEY") ?? "DEFAULTPASSWORDHASHKEY";
+            return "";
+        }
+    }
+    
+    public static string blobStoragePath
+    {
+        get
+        {
+            return "https://socialmediastorage.blob.core.windows.net/";
+            //return Environment.GetEnvironmentVariable("BLOB_STORAGE_PATH") ?? "https://socialmediastorage.blob.core.windows.net/";
         }
     }
 }
