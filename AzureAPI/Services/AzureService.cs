@@ -201,10 +201,10 @@ public class AzureService : IAzureService
         {
             _dbConnection.Open();
             var query =
-                "INSERT INTO Posts (id, Title, Content, Author, media_Url, CreatedAt) VALUES (@Id, @Title, @Content, @Author, @MediaUrl, @CreatedAt)";
+                "INSERT INTO Posts (id, Title, Content, Author, media_Url, CreatedAt, ModifiedAt) VALUES (@Id, @Title, @Content, @Author, @MediaUrl, @CreatedAt, @ModifiedAt)";
             var parameters = new
             {
-                Id = post.Id, Title = post.Title, Content = post.Content, Author = post.Author, MediaUrl = "", CreatedAt = DateTime.Now
+                Id = post.Id, Title = post.Title, Content = post.Content, Author = post.Author, MediaUrl = "", CreatedAt = DateTime.Now, ModifiedAt = DateTime.Now
             };
             
             _dbConnection.Execute(query, parameters);
@@ -226,7 +226,8 @@ public class AzureService : IAzureService
             Title = dbpost.Title,
             Content = dbpost.Content,
             Author = dbpost.Author,
-            Date = DateTime.SpecifyKind(dbpost.CreatedAt, DateTimeKind.Utc),
+            CreatedAt = DateTime.SpecifyKind(dbpost.CreatedAt, DateTimeKind.Utc),
+            ModifiedAt = DateTime.SpecifyKind(dbpost.ModifiedAt, DateTimeKind.Utc),
             MediaUrl = dbpost.Media_Url
         };
     }
@@ -236,7 +237,7 @@ public class AzureService : IAzureService
         try
         {
             _dbConnection.Open();
-            var query = "SELECT Id, Title, Content, Author, CreatedAt, Media_Url FROM Posts WHERE Id = @Id";
+            var query = "SELECT Id, Title, Content, Author, CreatedAt, ModifiedAt, Media_Url FROM Posts WHERE Id = @Id";
             var parameters = new {Id = id};
             var dbpost = _dbConnection.Query(query, parameters).Select(MapPost).SingleOrDefault();
             
@@ -255,17 +256,48 @@ public class AzureService : IAzureService
     
     public List<Post> GetPostsfromUserId(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            _dbConnection.Open();
+            var query = "SELECT Id, Title, Content, Author, CreatedAt, ModifiedAt, Media_Url FROM Posts WHERE Author = @Author";
+            var parameters = new {Author = id};
+            var dbposts = _dbConnection.Query(query, parameters).Select(MapPost).ToList();
+            
+            return dbposts;
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
     
-    public List<Post> GetPostsfromUsername(string username)
+    public void UpdatePost(Guid id, PostUpdateDto post)
     {
-        throw new NotImplementedException();
-    }
-    
-    public void UpdatePost(Guid id, Post post)
-    {
-        throw new NotImplementedException();
+        try
+        {
+            if (post.Title == null && post.Content == null)
+            {
+                throw new Exception("No data to update");
+            }
+            var queryBuildString = "";
+            if (post.Title != null) queryBuildString += "Title = @Title";
+            if (post.Content != null) queryBuildString += ",Content = @Content";
+            queryBuildString += ",ModifiedAt = @ModifiedAt";
+            if (queryBuildString.StartsWith(',')) queryBuildString = queryBuildString.Remove(0, 1);
+            
+            _dbConnection.Open();
+            var query = $"UPDATE Posts SET {queryBuildString} WHERE Id = @Id";
+            var parameters = new
+            {
+                Id = id, Title = post.Title, Content = post.Content, ModifiedAt = DateTime.Now
+            };
+            
+            _dbConnection.Execute(query, parameters);
+        }
+        finally
+        {
+            _dbConnection.CloseAsync();
+        }
     }
     
     public void UploadMedia(Guid id, string media)

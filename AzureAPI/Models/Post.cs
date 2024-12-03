@@ -14,7 +14,9 @@ public class Post
     
     public Guid Author { get; set; }
     
-    public DateTime Date { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime ModifiedAt { get; set; }
     
     public string? MediaUrl { get; set; }
     

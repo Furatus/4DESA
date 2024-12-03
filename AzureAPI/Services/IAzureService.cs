@@ -15,8 +15,7 @@ public interface IAzureService
     public Guid CreatePost(Post post);
     public Post GetPostById(Guid id);
     public List<Post> GetPostsfromUserId(Guid id);
-    public List<Post> GetPostsfromUsername(string username);
-    public void UpdatePost(Guid id, Post post);
+    public void UpdatePost(Guid id, PostUpdateDto post);
     public void UploadMedia(Guid id, string media);
     public void DeletePost(Guid id);
 }
