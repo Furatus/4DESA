@@ -7,7 +7,11 @@ C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\AzureAPI.runti
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\AzureAPI.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\AzureAPI.pdb
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Core.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Extensions.AspNetCore.Configuration.Secrets.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Security.KeyVault.Secrets.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Blobs.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Common.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Dapper.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Dapper.SqlBuilder.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
@@ -31,6 +35,7 @@ C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Swashbuckle.As
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.ClientModel.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.IO.Hashing.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.Memory.Data.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.Runtime.Caching.dll
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
@@ -72,8 +77,3 @@ C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\refint\AzureAP
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\AzureAPI.pdb
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\AzureAPI.genruntimeconfig.cache
 C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\obj\Debug\net8.0\ref\AzureAPI.dll
-C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Blobs.dll
-C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Storage.Common.dll
-C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\System.IO.Hashing.dll
-C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Extensions.AspNetCore.Configuration.Secrets.dll
-C:\Users\Aubin\Documents\azure\AzureAPI\AzureAPI\bin\Debug\net8.0\Azure.Security.KeyVault.Secrets.dll

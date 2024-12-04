@@ -102,4 +102,22 @@ public class PostController : ControllerBase
         azure.UpdatePost(postUpdateDto.Id, postUpdateDto);
         return Ok($"Post {postUpdateDto.Id} edited.");
     }
+    
+    [HttpDelete]
+    [Route("delete")]
+    [SwaggerResponse(401, "Non Autorisé.", null)]
+    [SwaggerResponse(200, "ok", typeof(string))]
+    [SwaggerResponse(500, "Erreur Interne", null)]
+    [Authorize]
+    public IActionResult DeletePost(IBlobStorageService blobStorage, IAzureService azure, [FromQuery] ItemId itemId)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var post = azure.GetPostById(itemId.Id);
+        if (post == null) return NotFound("Post not found");
+        if (post.Author.ToString() != userId) return Unauthorized("You are not the author of this post.");
+        if (post.MediaUrl != null) blobStorage.deleteFileFromAzureBlob(post.MediaUrl);
+        azure.DeletePost(itemId.Id);
+        return Ok($"Post {itemId.Id} deleted.");
+    }
+    
 }

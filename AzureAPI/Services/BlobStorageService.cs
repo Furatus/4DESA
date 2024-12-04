@@ -41,4 +41,20 @@ catch (Exception e)
             throw new Exception(e.Message);
         }
     }
+    
+    public void deleteFileFromAzureBlob(string uri)
+    {
+        try
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient("mediastorage");
+            var blobClient = new BlobClient(new Uri(uri));
+            var blobName = blobClient.Name;
+            var blobToDelete = containerClient.GetBlobClient(blobName);
+            blobToDelete.DeleteIfExists();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
 }
