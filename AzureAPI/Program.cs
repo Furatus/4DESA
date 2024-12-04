@@ -25,13 +25,23 @@ builder.Services.AddHttpsRedirection(options =>
     options.HttpsPort = 443; // Port HTTPS par défaut
 });
 
-string keyVaultUri = builder.Configuration["KeyVaultUri"];
+var keyVaultUri = builder.Configuration["Azure_KeyVaultUri"];
+var clientId = builder.Configuration["Azure_ClientId"];
+var tenantId = builder.Configuration["Azure_TenantId"];
+
+var credentialOptions = new DefaultAzureCredentialOptions
+{
+    TenantId = tenantId,
+    ManagedIdentityClientId = clientId
+};
+
+var credential = new DefaultAzureCredential(credentialOptions);
 
 if (!string.IsNullOrEmpty(keyVaultUri))
 {
     builder.Configuration.AddAzureKeyVault(
         new Uri(keyVaultUri),
-        new DefaultAzureCredential());
+        credential);
 }
 
 builder.Services.AddSingleton<SecretsManager>();
@@ -135,4 +145,3 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 app.Run();
-
