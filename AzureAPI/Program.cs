@@ -25,24 +25,52 @@ builder.Services.AddHttpsRedirection(options =>
     options.HttpsPort = 443; // Port HTTPS par défaut
 });
 
-var keyVaultUri = builder.Configuration["Azure_KeyVaultUri"];
-var clientId = builder.Configuration["Azure_ClientId"];
-var tenantId = builder.Configuration["Azure_TenantId"];
 
-var credentialOptions = new DefaultAzureCredentialOptions
+builder.Services.AddSingleton(options =>
 {
-    TenantId = tenantId,
-    ManagedIdentityClientId = clientId
-};
+    var keyVaultUri = builder.Configuration["Azure_KeyVaultUri"];
+    var clientId = builder.Configuration["Azure_ClientId"];
+    var tenantId = builder.Configuration["Azure_TenantId"];
 
-var credential = new DefaultAzureCredential(credentialOptions);
+    var credentialOptions = new DefaultAzureCredentialOptions
+    {
+        TenantId = tenantId,
+        ManagedIdentityClientId = clientId
+    };
 
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultUri),
-        credential);
-}
+    var credential = new DefaultAzureCredential(credentialOptions);
+
+    var clientOptions = new SecretClientOptions
+    {
+        Retry =
+        {
+            Delay = TimeSpan.FromSeconds(2),
+            MaxDelay = TimeSpan.FromSeconds(10),
+            MaxRetries = 3,
+            Mode = Azure.Core.RetryMode.Exponential
+        }
+    };
+
+    return new SecretClient(new Uri(keyVaultUri), credential, clientOptions);
+});
+// var keyVaultUri = builder.Configuration["Azure_KeyVaultUri"];
+// var clientId = builder.Configuration["Azure_ClientId"];
+// var tenantId = builder.Configuration["Azure_TenantId"];
+//
+// var credentialOptions = new DefaultAzureCredentialOptions
+// {
+//     TenantId = tenantId,
+//     ManagedIdentityClientId = clientId
+// };
+//
+// var credential = new DefaultAzureCredential(credentialOptions);
+//
+// if (!string.IsNullOrEmpty(keyVaultUri))
+// {
+//     builder.Configuration.AddAzureKeyVault(
+//         new Uri(keyVaultUri),
+//         credential);
+// }
 
 builder.Services.AddSingleton<SecretsManager>();
     

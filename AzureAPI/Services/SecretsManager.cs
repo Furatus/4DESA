@@ -1,4 +1,6 @@
-﻿namespace AzureAPI.Services;
+﻿using Azure.Security.KeyVault.Secrets;
+
+namespace AzureAPI.Services;
 
 public class SecretsManager
 {
@@ -8,11 +10,11 @@ public class SecretsManager
     
     public string BlobStorageConnectionString { get; private set; }
 
-    public SecretsManager(IConfiguration configuration)
+    public SecretsManager(SecretClient secretClient)
     {
-        DatabaseConnectionString = configuration["DbConnectionString"];
-        JwtSecret = configuration["JwtSecret"];
-        PasswordHashKey = configuration["PasswordHashKey"];
-        BlobStorageConnectionString = configuration["BlobStorageConnectionString"];
+        DatabaseConnectionString = secretClient.GetSecret("DbConnectionString").Value.Value;
+        JwtSecret = secretClient.GetSecret("JwtSecret").Value.Value;
+        PasswordHashKey = secretClient.GetSecret("PasswordHashKey").Value.Value;
+        BlobStorageConnectionString = secretClient.GetSecret("BlobStorageConnectionString").Value.Value;
     }
 }
