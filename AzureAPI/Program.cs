@@ -19,14 +19,20 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Configuration.AddEnvironmentVariables();
 
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 443; // Port HTTPS par défaut
+});
+
 string keyVaultUri = builder.Configuration["KeyVaultUri"];
 
-/*if (!string.IsNullOrEmpty(keyVaultUri))
+if (!string.IsNullOrEmpty(keyVaultUri))
 {
     builder.Configuration.AddAzureKeyVault(
         new Uri(keyVaultUri),
         new DefaultAzureCredential());
-}*/
+}
 
 builder.Services.AddSingleton<SecretsManager>();
     
@@ -36,12 +42,13 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
+    var secretsManager = builder.Services.BuildServiceProvider().GetRequiredService<SecretsManager>();
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
         ValidateAudience = false,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Env.JwtSecret))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretsManager.JwtSecret)),
     };
 });
 
@@ -99,20 +106,30 @@ builder.Services.AddCors(c =>
 
 builder.Services.AddScoped<IJwtAuthService, JwtAuthService>();
 builder.Services.AddScoped<IAzureService, AzureService>();
-builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(Env.dbString));
+builder.Services.AddScoped<SqlConnection>(sp =>
+{
+    var secretsManager = sp.GetRequiredService<SecretsManager>();
+    return new SqlConnection(secretsManager.DatabaseConnectionString);
+});
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
-builder.Services.AddScoped<BlobServiceClient>(_ => new BlobServiceClient(Env.blobStorageConnectionString));
+builder.Services.AddScoped<BlobServiceClient>(sp =>
+{
+    var secretsManager = sp.GetRequiredService<SecretsManager>();
+    return new BlobServiceClient(secretsManager.BlobStorageConnectionString);
+});
+builder.Services.AddScoped<EncryptionService>();
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseHttpsRedirection();
 app.UseCors();
 
 app.MapControllers();
 
-app.UseHttpsRedirection();
+
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,13 +1,20 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace AzureAPI.Services;
 
 public class EncryptionService
 {
-    public static string EncryptString(string plainText)
+    private readonly SecretsManager _secretsManager;
+    public EncryptionService(SecretsManager secretsManager)
     {
-        var key = Env.passwordHashKey;
+        _secretsManager = secretsManager;
+    }
+    
+    public string EncryptString(string plainText)
+    {
+        var key = _secretsManager.PasswordHashKey; 
         byte[] iv = new byte[16];
         byte[] array;
 
@@ -35,9 +42,9 @@ public class EncryptionService
         return Convert.ToBase64String(array);
     }
 
-    public static string DecryptString(string cipherText)
+    public string DecryptString(string cipherText)
     {
-        var key = Env.passwordHashKey;
+        var key = _secretsManager.PasswordHashKey;
         byte[] iv = new byte[16];
         byte[] buffer = Convert.FromBase64String(cipherText);
 

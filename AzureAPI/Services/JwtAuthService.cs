@@ -12,10 +12,12 @@ namespace AzureAPI.Services;
 public class JwtAuthService : IJwtAuthService
 {
     private IAzureService _azureService;
+    private EncryptionService _encryptionService;
     
-    public JwtAuthService(IAzureService azureService)
+    public JwtAuthService(IAzureService azureService, EncryptionService encryptionService)
     {
         _azureService = azureService;
+        _encryptionService = encryptionService;
     }
 
     public User Authenticate(Login userlogin)
@@ -31,7 +33,7 @@ public class JwtAuthService : IJwtAuthService
             return null;
         }
 
-        var decryptedPassword = EncryptionService.DecryptString(loginginUser.Password);
+        var decryptedPassword = _encryptionService.DecryptString(loginginUser.Password);
         if (decryptedPassword != userlogin.Password)
         {
             return null;

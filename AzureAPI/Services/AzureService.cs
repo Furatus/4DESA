@@ -7,10 +7,12 @@ namespace AzureAPI.Services;
 public class AzureService : IAzureService
 {
     private readonly SqlConnection _dbConnection;
+    private readonly EncryptionService _encryptionService;
     
-    public AzureService(SqlConnection dbConnection)
+    public AzureService(SqlConnection dbConnection, EncryptionService encryptionService)
     {
         _dbConnection = dbConnection;
+        _encryptionService = encryptionService;
     }
     public Guid RegsiterUser(User user)
     {
@@ -19,7 +21,7 @@ public class AzureService : IAzureService
             _dbConnection.Open();
             user.Id = Guid.NewGuid();
             user.IsPrivate = false;
-            user.Password = EncryptionService.EncryptString(user.Password);
+            user.Password = _encryptionService.EncryptString(user.Password);
 
             var query =
                 "INSERT INTO Users (Id, Username, Password, Email, IsPrivate) VALUES (@Id, @Username, @Password, @Email, @IsPrivate)";
@@ -151,7 +153,7 @@ public class AzureService : IAzureService
             var query = $"UPDATE Users SET {queryBuildString} WHERE Id = @Id";
             var parameters = new
             {
-                Id = id, Username = user.Username, Password = EncryptionService.EncryptString(user.Password), Email = user.Email
+                Id = id, Username = user.Username, Password = _encryptionService.EncryptString(user.Password), Email = user.Email
             };
             
             _dbConnection.Execute(query, parameters);

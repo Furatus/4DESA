@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Security.AccessControl;
+using System.Security.Claims;
 using AzureAPI;
 using AzureAPI.Models;
 using AzureAPI.Services;
@@ -11,6 +12,12 @@ namespace AzureAPI.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
+    private readonly SecretsManager _secretsManager;
+    public AuthController(SecretsManager secretsManager)
+    {
+        _secretsManager = secretsManager;
+    }
+    
     [HttpPost]
     [SwaggerResponse(401, "Non Autorisé.", null)]
     [SwaggerResponse(200, "ok", typeof(string))]
@@ -25,7 +32,7 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
         };
         var token = jwtAuthService.GenerateToken(
-            Env.JwtSecret, claims);
+            _secretsManager.JwtSecret, claims);
 
         return Ok(token);
     }
